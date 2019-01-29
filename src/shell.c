@@ -6,9 +6,7 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "raw_mode.h"
-
-#define PROMPT "\xF0\x9F\xA6\x84  > "
+#include "command.h"
 
 static void	process_input(struct s_shell *shell)
 {
@@ -19,17 +17,14 @@ static void	process_input(struct s_shell *shell)
 	shell->env[shell->env_len] = 0;
 	env = (char *)shell->buffer;
 	i = 0;
-	while (i > shell->env_len)
+	while (i < shell->env_len)
 	{
 		shell->env[i++] = env;
 		env += strlen(env) + 1;
 	}
 	shell->dirty_env = false;
 	while (!shell->dirty_env)
-	{
-		write(1, PROMPT, sizeof(PROMPT) - 1);
-
-	}
+		read_command(shell);
 }
 
 static bool	copy_env_to_buff(struct s_shell *shell, char *env[])
@@ -41,6 +36,8 @@ static bool	copy_env_to_buff(struct s_shell *shell, char *env[])
 		len = strlen(*env) + 1;
 		if (shell->env_size + len > shell->buffer_size)
 			return (false);
+		if (memcmp(*env, "PATH=", 5) == 0)
+			shell->path = (char *)(shell->buffer + shell->env_size);
 		memcpy(shell->buffer + shell->env_size, *env, len);
 		shell->env_size += len;
 		shell->env_len++;
@@ -50,6 +47,7 @@ static bool	copy_env_to_buff(struct s_shell *shell, char *env[])
 }
 
 #define ENV_TOO_BIG "env is bigger than ARG_MAX, ARG_MAX is not well defined"
+#define ARG_MAX 50024
 
 int	main(int ac, char *av[], char *env[])
 {
@@ -60,20 +58,15 @@ int	main(int ac, char *av[], char *env[])
 	shell = (struct s_shell) {
 		.buffer = buffer,
 		.buffer_size = sizeof(buffer),
-		.name = av[0]
+		.name = av[0],
+		.path = NULL
 	};
 	if (!copy_env_to_buff(&shell, env))
 	{
 		write(1, ENV_TOO_BIG, sizeof(ENV_TOO_BIG) - 1);
 		return (1);
 	}
-	if (!start_raw_mode(&shell))
-	{
-		perror(shell.name);
-		return (1);
-	}
 	while (true)
 		process_input(&shell);
-
 	return (0);
 }

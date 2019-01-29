@@ -15,7 +15,7 @@
 #include "ft/str.h"
 #include <unistd.h>
 
-int	builtin_env(int argc, char **argv, t_shell *shell)
+int	builtin_env(int argc, char **argv, struct s_shell *shell)
 {
 	size_t	i;
 

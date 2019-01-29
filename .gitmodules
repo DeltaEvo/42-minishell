@@ -1,3 +1,6 @@
 [submodule "libft"]
 	path = libft
 	url = git@github.com:DeltaEvo/libft.git
+[submodule "librl"]
+	path = librl
+	url = git@github.com:DeltaEvo/librl.git

@@ -36,16 +36,29 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 {
 	t_builtin	builtin;
 	char 	bin[PATH_MAX + 1];
+	int		pid;
 
 	builtin = find_builtin(argv[0]);
 	if (builtin)
 	 	return builtin(argc, argv, shell);
-	if (!lookup_path(argv[0], shell->path + 5, bin, sizeof(bin))
+	if (strchr(argv[0], '/'))
+		strcpy(bin, argv[0]);
+	else if (!(shell->path && lookup_path(argv[0], shell->path + 5, bin, sizeof(bin))))
 	{
-		// Unknown command;
+		ft_putf_fd(2, "%s: command not found\n", argv[0]);
 		return (-1);
 	}
-
+	pid = fork();
+	if (pid == -1)
+		exit(2);
+	else if (pid != 0)
+		waitpid(pid, &pid, 0);
+	else
+	{
+		execve(bin, argv, shell->env);
+		perror("minishell");
+		exit(0);
+	}
 }
 
 void	exec_buffer(struct s_shell *shell, size_t buffer_size)
@@ -58,14 +71,15 @@ void	exec_buffer(struct s_shell *shell, size_t buffer_size)
 	i = 0;
 	argc = 0;
 	while (i < buffer_size)
-		argc += (shell->buffer[i++] == '\0');
+		argc += (shell->buffer[shell->env_size + i++] == '\0');
 	argv = __builtin_alloca((argc + 1) * sizeof(char *));
-	argv[argc] = 0;
 	i = 0;
 	j = 0;
-	argv[j++] = (char *)shell->buffer;
+	argv[argc] = 0;
+	argv[j++] = (char *)shell->buffer + shell->env_size;
 	while (i < buffer_size)
-		if (shell->buffer[i++] == '\0')
-			argv[j++] = (char *)shell->buffer;
+		if (shell->buffer[shell->env_size + i++] == '\0')
+			argv[j++] = (char *)(shell->buffer + shell->env_size + i);
+	argv[argc] = 0;
 	exec(shell, argc, argv);
 }

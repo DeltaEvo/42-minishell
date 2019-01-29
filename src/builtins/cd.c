@@ -10,11 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include <unistd.h>
 
 int	builtin_cd(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
-	exit(0);
+	if (argc == 2)
+		chdir(argv[1]);
+	else
+		chdir("/home/david");
 }

@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME=minishell
-CFLAGS=-Wall -Werror -Wextra -Iinclude -Ilibft/include -g
+CFLAGS=-Wall -Wextra -Werror -Iinclude -Ilibft/include -Ilibrl/include -g
 CC=gcc
 
 include src.mk
@@ -24,14 +24,17 @@ $(OBJS): Makefile src.mk
 
 $(NAME): $(OBJS)
 	$(MAKE) -C libft libft.a
-	$(CC) -o $(NAME) $(OBJS) libft/libft.a
+	$(MAKE) -C librl librl.a
+	$(CC) -o $(NAME) $(OBJS) libft/libft.a librl/librl.a
 
 clean:
 	$(MAKE) -C libft clean
+	$(MAKE) -C librl clean
 	rm -f $(OBJS)
 
 fclean: clean
 	$(MAKE) -C libft fclean
+	$(MAKE) -C librl fclean
 	rm -rf $(NAME)
 
 re: fclean $(NAME)

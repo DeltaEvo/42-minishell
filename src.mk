@@ -1,2 +1,10 @@
-SRCS += src/raw_mode.c
+SRCS += src/command.c
+SRCS += src/exec.c
 SRCS += src/shell.c
+SRCS += src/builtin.c
+SRCS += src/builtins/cd.c
+SRCS += src/builtins/echo.c
+SRCS += src/builtins/env.c
+SRCS += src/builtins/exit.c
+SRCS += src/builtins/setenv.c
+SRCS += src/builtins/unsetenv.c

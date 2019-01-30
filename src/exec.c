@@ -6,10 +6,9 @@
 #include <limits.h>
 #include <stdbool.h>
 
-static bool	lookup_path(char *name, char *path, char *res, size_t res_size)
+bool	lookup_path(char *name, size_t name_len, char *path, char *res, size_t res_size)
 {
 	char 			*end;
-	const size_t	name_len = ft_strlen(name) + 1;
 	size_t			path_len;
 
 	while (1)
@@ -19,11 +18,12 @@ static bool	lookup_path(char *name, char *path, char *res, size_t res_size)
 			end = strchr(path, 0);
 		path_len = end - path;
 		// TODO: E2BIG ?
-		if (path_len + 1 + name_len > res_size)
+		if (path_len + 1 + name_len + 1 > res_size)
 			continue ;
 		memcpy(res, path, path_len);
 		res[path_len] = '/';
 		memcpy(res + path_len + 1, name, name_len);
+		res[path_len + 1 + name_len] = '\0';
 		if (access(res, X_OK) != -1)
 			return (true);
 		if (*end == 0)
@@ -37,13 +37,14 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 	t_builtin	builtin;
 	char 	bin[PATH_MAX + 1];
 	int		pid;
+	int		status;
 
 	builtin = find_builtin(argv[0]);
 	if (builtin)
 	 	return builtin(argc, argv, shell);
 	if (strchr(argv[0], '/'))
 		strcpy(bin, argv[0]);
-	else if (!(shell->path && lookup_path(argv[0], shell->path + 5, bin, sizeof(bin))))
+	else if (!(shell->path && lookup_path(argv[0], ft_strlen(argv[0]), shell->path + 5, bin, sizeof(bin))))
 	{
 		ft_putf_fd(2, "%s: command not found\n", argv[0]);
 		return (-1);
@@ -52,13 +53,13 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 	if (pid == -1)
 		exit(2);
 	else if (pid != 0)
-		waitpid(pid, &pid, 0);
-	else
 	{
-		execve(bin, argv, shell->env);
-		perror("minishell");
-		exit(0);
+		waitpid(pid, &status, 0);
+		return (status);
 	}
+	execve(bin, argv, shell->env);
+	perror("minishell");
+	exit(0);
 }
 
 void	exec_buffer(struct s_shell *shell, size_t buffer_size)

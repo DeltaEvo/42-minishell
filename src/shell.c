@@ -1,17 +1,29 @@
-#include <limits.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdbool.h>
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/01/31 15:41:29 by dde-jesu          #+#    #+#             */
+/*   Updated: 2019/01/31 15:41:47 by dde-jesu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "shell.h"
 #include "command.h"
+#include "ft/mem.h"
+#include "ft/str.h"
+
+#include <limits.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <stdbool.h>
 
 static void	process_input(struct s_shell *shell)
 {
 	char	*env;
-	size_t  i;
+	size_t	i;
 
 	shell->env = __builtin_alloca((shell->env_len + 1) * sizeof(char *));
 	shell->env[shell->env_len] = 0;
@@ -20,7 +32,7 @@ static void	process_input(struct s_shell *shell)
 	while (i < shell->env_len)
 	{
 		shell->env[i++] = env;
-		env += strlen(env) + 1;
+		env += ft_strlen(env) + 1;
 	}
 	shell->dirty_env = false;
 	while (!shell->dirty_env)
@@ -33,12 +45,12 @@ static bool	copy_env_to_buff(struct s_shell *shell, char *env[])
 
 	while (*env)
 	{
-		len = strlen(*env) + 1;
+		len = ft_strlen(*env) + 1;
 		if (shell->env_size + len > shell->buffer_size)
 			return (false);
-		if (memcmp(*env, "PATH=", 5) == 0)
+		if (ft_memcmp(*env, "PATH=", 5) == 0)
 			shell->path = (char *)(shell->buffer + shell->env_size);
-		memcpy(shell->buffer + shell->env_size, *env, len);
+		ft_memcpy(shell->buffer + shell->env_size, *env, len);
 		shell->env_size += len;
 		shell->env_len++;
 		env++;
@@ -47,9 +59,8 @@ static bool	copy_env_to_buff(struct s_shell *shell, char *env[])
 }
 
 #define ENV_TOO_BIG "env is bigger than ARG_MAX, ARG_MAX is not well defined"
-#define ARG_MAX 50024
 
-int	main(int ac, char *av[], char *env[])
+int			main(int ac, char *av[], char *env[])
 {
 	struct s_shell	shell;
 	uint8_t			buffer[ARG_MAX];

@@ -1,30 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   env.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/12/20 16:44:35 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/01/31 15:39:11 by dde-jesu         ###   ########.fr       */
+/*   Created: 2019/01/31 13:31:32 by dde-jesu          #+#    #+#             */
+/*   Updated: 2019/01/31 15:15:30 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft/str.h"
-#include <unistd.h>
+#ifndef ENV_H
+# define ENV_H
 
-int	builtin_echo(int argc, char **argv)
-{
-	int	i;
+# include "shell.h"
 
-	i = 1;
-	while (i < argc)
-	{
-		write(1, argv[i], ft_strlen(argv[i]));
-		if (i != argc - 1)
-			write(1, " ", 1);
-		i++;
-	}
-	write(1, "\n", 1);
-	return (0);
-}
+char	*sh_getenv(struct s_shell *shell, char *name);
+bool	sh_setenv(struct s_shell *shell, char *name, char *value);
+bool	sh_unsetenv(struct s_shell *shell, char *name);
+
+#endif

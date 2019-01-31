@@ -1,5 +1,6 @@
 SRCS += src/command.c
 SRCS += src/exec.c
+SRCS += src/env.c
 SRCS += src/shell.c
 SRCS += src/builtin.c
 SRCS += src/builtins/cd.c

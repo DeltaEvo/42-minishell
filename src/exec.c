@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "builtin.h"
 #include "ft/str.h"
+#include "ft/io.h"
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -38,13 +39,14 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 	char 	bin[PATH_MAX + 1];
 	int		pid;
 	int		status;
+	const size_t	av0_size = ft_strlen(argv[0]);
 
-	builtin = find_builtin(argv[0]);
+	builtin = find_builtin(argv[0], av0_size);
 	if (builtin)
 	 	return builtin(argc, argv, shell);
 	if (strchr(argv[0], '/'))
 		strcpy(bin, argv[0]);
-	else if (!(shell->path && lookup_path(argv[0], ft_strlen(argv[0]), shell->path + 5, bin, sizeof(bin))))
+	else if (!(shell->path && lookup_path(argv[0], av0_size, shell->path + 5, bin, sizeof(bin))))
 	{
 		ft_putf_fd(2, "%s: command not found\n", argv[0]);
 		return (-1);

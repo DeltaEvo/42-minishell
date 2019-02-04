@@ -6,12 +6,12 @@
 #    By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/06 16:01:17 by dde-jesu          #+#    #+#              #
-#    Updated: 2019/01/31 11:35:12 by dde-jesu         ###   ########.fr        #
+#    Updated: 2019/02/04 17:10:54 by dde-jesu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME=minishell
-CFLAGS=-Wall -Wextra -Werror -Iinclude -Ilibft/include -Ilibrl/include -g
+CFLAGS=-Wall -Wextra -Iinclude -Ilibft/include -Ilibrl/include -g -fsanitize=address
 CC=gcc
 
 include src.mk
@@ -25,7 +25,7 @@ $(OBJS): Makefile src.mk
 $(NAME): $(OBJS)
 	$(MAKE) -C libft libft.a
 	$(MAKE) -C librl librl.a
-	$(CC) -o $(NAME) $(OBJS) libft/libft.a librl/librl.a
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) libft/libft.a librl/librl.a
 
 clean:
 	$(MAKE) -C libft clean

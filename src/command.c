@@ -6,13 +6,14 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:40:25 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/01/31 15:42:34 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/04 17:38:37 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 #include "exec.h"
 #include "builtin.h"
+#include "expand.h"
 #include "rl.h"
 #include "ft/mem.h"
 #include <stdlib.h>
@@ -106,7 +107,7 @@ void		read_command(struct s_shell *shell)
 	if (r > 0)
 	{
 		state.buffer[r] = '\0';
-		exec_buffer(shell, r + 1);
+		exec_buffer(shell, perform_expansion(shell, r + 1));
 	}
 	else if (r < 0)
 		exit(0);

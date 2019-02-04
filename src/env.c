@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 13:27:06 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/01/31 15:41:18 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/04 16:10:09 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,8 @@
 #include "ft/mem.h"
 #include "ft/str.h"
 
-static void	*ft_memmove(void *dst, const void *src, size_t len)
+char		*sh_getenv(struct s_shell *shell, char *name, size_t name_size)
 {
-	const char	*c_src = src;
-	char		*c_dst;
-
-	c_dst = dst;
-	if (dst > src)
-		while (len--)
-			c_dst[len] = c_src[len];
-	else
-		while (len--)
-			*c_dst++ = *c_src++;
-	return (dst);
-}
-
-char		*sh_getenv(struct s_shell *shell, char *name)
-{
-	const size_t	name_size = ft_strlen(name);
 	size_t			size;
 	size_t			len;
 	char			*env;
@@ -61,7 +45,7 @@ bool		sh_unsetenv(struct s_shell *shell, char *name)
 
 	if (name_size == 4 && ft_memcmp(name, "PATH", 4) == 0)
 		shell->path = NULL;
-	if ((env = sh_getenv(shell, name)))
+	if ((env = sh_getenv(shell, name, name_size)))
 	{
 		len = ft_strlen(env) + name_size + 1;
 		env -= name_size + 1;

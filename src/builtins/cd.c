@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:27 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/01/31 15:40:09 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/04 16:10:39 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,13 @@ int	builtin_cd(int argc, char **argv, struct s_shell *shell)
 		return (args_usage(args, argv[0], "[directory]", "") || 1);
 	argc -= ret;
 	argv += ret;
-	if (argc == 0 && !(directory = sh_getenv(shell, "HOME")))
+	if (argc == 0 && !(directory = sh_getenv(shell, "HOME", 4)))
 		return (write(2, NO_HOME, sizeof(NO_HOME) - 1) & 0 + 1);
 	if (argc == 1)
 	{
 		directory = argv[0];
 		if (directory[0] == '-' && directory[1] == '\0'
-			&& !(directory = sh_getenv(shell, "OLDPWD")))
+			&& !(directory = sh_getenv(shell, "OLDPWD", 6)))
 			return (write(2, NO_OLDPWD, sizeof(NO_OLDPWD) - 1) & 0 + 1);
 	}
 	if (argc > 1)

@@ -1,29 +1,42 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
+/*   Updated: 2019/02/04 14:13:32 by dde-jesu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 #include "builtin.h"
 #include "ft/str.h"
 #include "ft/io.h"
+#include "ft/mem.h"
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
 
-bool	lookup_path(char *name, size_t name_len, char *path, char *res, size_t res_size)
+bool		lookup_path(char *name, size_t name_len, char *path, char *res,
+		size_t res_size)
 {
-	char 			*end;
-	size_t			path_len;
+	char	*end;
+	size_t	path_len;
 
 	while (1)
 	{
-		end = strchr(path, ':');
+		end = ft_strchr(path, ':');
 		if (!end)
-			end = strchr(path, 0);
+			end = path + ft_strlen(path);
 		path_len = end - path;
-		// TODO: E2BIG ?
 		if (path_len + 1 + name_len + 1 > res_size)
 			continue ;
-		memcpy(res, path, path_len);
+		ft_memcpy(res, path, path_len);
 		res[path_len] = '/';
-		memcpy(res + path_len + 1, name, name_len);
+		ft_memcpy(res + path_len + 1, name, name_len);
 		res[path_len + 1 + name_len] = '\0';
 		if (access(res, X_OK) != -1)
 			return (true);
@@ -35,18 +48,19 @@ bool	lookup_path(char *name, size_t name_len, char *path, char *res, size_t res_
 
 static int	exec(struct s_shell *shell, size_t argc, char **argv)
 {
-	t_builtin	builtin;
-	char 	bin[PATH_MAX + 1];
-	int		pid;
-	int		status;
+	t_builtin		builtin;
+	char			bin[PATH_MAX + 1];
+	int				pid;
+	int				status;
 	const size_t	av0_size = ft_strlen(argv[0]);
 
 	builtin = find_builtin(argv[0], av0_size);
 	if (builtin)
-	 	return builtin(argc, argv, shell);
-	if (strchr(argv[0], '/'))
-		strcpy(bin, argv[0]);
-	else if (!(shell->path && lookup_path(argv[0], av0_size, shell->path + 5, bin, sizeof(bin))))
+		return (builtin(argc, argv, shell));
+	if (ft_memchr(argv[0], '/', av0_size) && av0_size < sizeof(bin))
+		ft_memcpy(bin, argv[0], av0_size + 1);
+	else if (!(shell->path
+		&& lookup_path(argv[0], av0_size, shell->path + 5, bin, sizeof(bin))))
 	{
 		ft_putf_fd(2, "%s: command not found\n", argv[0]);
 		return (-1);
@@ -55,18 +69,15 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 	if (pid == -1)
 		exit(2);
 	else if (pid != 0)
-	{
-		waitpid(pid, &status, 0);
-		return (status);
-	}
+		return (waitpid(pid, &status, 0) == 0 ? status : 1);
 	execve(bin, argv, shell->env);
 	perror("minishell");
-	exit(0);
+	exit(1);
 }
 
-void	exec_buffer(struct s_shell *shell, size_t buffer_size)
+void		exec_buffer(struct s_shell *shell, size_t buffer_size)
 {
-	char 	**argv;
+	char	**argv;
 	size_t	argc;
 	size_t	i;
 	size_t	j;

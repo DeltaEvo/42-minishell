@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/04 14:13:32 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/07 17:08:02 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,10 @@ bool		lookup_path(char *name, size_t name_len, char *path, char *res,
 			end = path + ft_strlen(path);
 		path_len = end - path;
 		if (path_len + 1 + name_len + 1 > res_size)
+		{
+			path = end + 1;
 			continue ;
+		}
 		ft_memcpy(res, path, path_len);
 		res[path_len] = '/';
 		ft_memcpy(res + path_len + 1, name, name_len);
@@ -75,6 +78,8 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 	exit(1);
 }
 
+#include <stdio.h>
+
 void		exec_buffer(struct s_shell *shell, size_t buffer_size)
 {
 	char	**argv;
@@ -89,7 +94,6 @@ void		exec_buffer(struct s_shell *shell, size_t buffer_size)
 	argv = __builtin_alloca((argc + 1) * sizeof(char *));
 	i = 0;
 	j = 0;
-	argv[argc] = 0;
 	argv[j++] = (char *)shell->buffer + shell->env_size;
 	while (i < buffer_size)
 		if (shell->buffer[shell->env_size + i++] == '\0')

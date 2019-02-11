@@ -6,12 +6,12 @@
 #    By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/06 16:01:17 by dde-jesu          #+#    #+#              #
-#    Updated: 2019/02/05 09:54:48 by dde-jesu         ###   ########.fr        #
+#    Updated: 2019/02/11 13:57:00 by dde-jesu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME=minishell
-CFLAGS=-Wall -Wextra -Iinclude -Ilibft/include -Ilibrl/include -g -fsanitize=address
+CFLAGS=-Wall -Wextra -Iinclude -Ilibft/include -Ilibrl/include
 CC=gcc
 
 include src.mk

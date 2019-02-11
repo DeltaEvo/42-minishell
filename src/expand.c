@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:07:28 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/07 14:02:36 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/07 17:48:12 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ size_t		perform_expansion(struct s_shell *shell, size_t size)
 		expand_dollar(shell, arg, &len, &size);
 		if (len == 0)
 		{
-			ft_memmove(arg + 1, arg, size - i - 1);
+			ft_memmove(arg, arg + 1, size - i - 1);
 			size--;
 		}
 		else

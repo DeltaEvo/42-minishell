@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/07 17:08:02 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/12 13:39:19 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,21 +49,17 @@ bool		lookup_path(char *name, size_t name_len, char *path, char *res,
 	}
 }
 
-static int	exec(struct s_shell *shell, size_t argc, char **argv)
+int	exec_binary(char *path, size_t argc, char **argv, char **env)
 {
-	t_builtin		builtin;
 	char			bin[PATH_MAX + 1];
 	int				pid;
 	int				status;
 	const size_t	av0_size = ft_strlen(argv[0]);
 
-	builtin = find_builtin(argv[0], av0_size);
-	if (builtin)
-		return (builtin(argc, argv, shell));
 	if (ft_memchr(argv[0], '/', av0_size) && av0_size < sizeof(bin))
 		ft_memcpy(bin, argv[0], av0_size + 1);
-	else if (!(shell->path
-		&& lookup_path(argv[0], av0_size, shell->path + 5, bin, sizeof(bin))))
+	else if (!(path
+		&& lookup_path(argv[0], av0_size, path + 5, bin, sizeof(bin))))
 	{
 		ft_putf_fd(2, "%s: command not found\n", argv[0]);
 		return (-1);
@@ -73,12 +69,21 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 		exit(2);
 	else if (pid != 0)
 		return (waitpid(pid, &status, 0) == 0 ? status : 1);
-	execve(bin, argv, shell->env);
+	execve(bin, argv, env);
 	perror("minishell");
 	exit(1);
 }
 
-#include <stdio.h>
+static int	exec(struct s_shell *shell, size_t argc, char **argv)
+{
+	t_builtin		builtin;
+	const size_t	av0_size = ft_strlen(argv[0]);
+
+	if ((builtin = find_builtin(argv[0], av0_size)))
+		return (builtin(argc, argv, shell));
+	else
+		return (exec_binary(shell->path, argc, argv, shell->env));
+}
 
 void		exec_buffer(struct s_shell *shell, size_t buffer_size)
 {

@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/12 13:39:19 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/12 15:16:01 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ bool		lookup_path(char *name, size_t name_len, char *path, char *res,
 	}
 }
 
-int	exec_binary(char *path, size_t argc, char **argv, char **env)
+int	exec_binary(char *path, char **argv, char **env)
 {
 	char			bin[PATH_MAX + 1];
 	int				pid;
@@ -82,7 +82,7 @@ static int	exec(struct s_shell *shell, size_t argc, char **argv)
 	if ((builtin = find_builtin(argv[0], av0_size)))
 		return (builtin(argc, argv, shell));
 	else
-		return (exec_binary(shell->path, argc, argv, shell->env));
+		return (exec_binary(shell->path, argv, shell->env));
 }
 
 void		exec_buffer(struct s_shell *shell, size_t buffer_size)

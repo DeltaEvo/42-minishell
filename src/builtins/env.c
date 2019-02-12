@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:45 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/12 15:08:36 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/12 15:17:32 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int exec_not_inherit(int argc, char **args, struct s_shell *shell)
 		i++;
 	}
 	args[i - 1] = 0;
-	return (exec_binary(path, argc - i, args + i, args - 1));
+	return (exec_binary(path, args + i, args - 1));
 }
 
 static char	*copy_env_and_get_path(char **env, int argc, char **args, struct s_shell *shell)
@@ -107,7 +107,7 @@ static int	exec_inherit(int argc, char **args, struct s_shell *shell)
 	ft_memcpy(env, shell->env, sizeof(*env) * shell->env_len);
 	env[len] = 0;
 	path = copy_env_and_get_path(env, argc, args, shell);
-	return (exec_binary(path, argc - i, args + i, env));
+	return (exec_binary(path, args + i, env));
 }
 
 int			builtin_env(int argc, char **argv, struct s_shell *shell)

@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:27 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/04 16:10:39 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/12 15:25:35 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,11 @@
 #include "env.h"
 #include "ft/args.h"
 #include <unistd.h>
+#include <limits.h>
 
-#define ARG2BIG "Too much arguments\n"
+#define ARG2BIG "Too many arguments for cd command\n"
 #define NO_HOME "$HOME not set\n"
 #define NO_OLDPWD "$OLDPWD not set\n"
-
-#include <stdio.h>
-#include <limits.h>
 
 int	builtin_cd(int argc, char **argv, struct s_shell *shell)
 {

@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 15:42:36 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/12 15:22:12 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/12 15:24:43 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <limits.h>
-#define USAGE "exit [n]\n"
+#define USAGE "Usgae: exit [n]\n"
 
 static bool		ft_atoi(const char *str, int *res)
 {

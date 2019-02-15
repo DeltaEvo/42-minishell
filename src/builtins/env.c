@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:45 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/15 10:49:03 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/15 11:31:26 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ int			builtin_env(int argc, char **argv, struct s_shell *shell)
 	if (argc)
 		return ((not_inherit ? exec_not_inherit
 					: exec_inherit)(argc, argv, shell));
-	else
+	else if (!not_inherit)
 		print_env(shell->env);
 	return (0);
 }

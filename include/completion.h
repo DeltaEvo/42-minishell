@@ -1,22 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec.h                                             :+:      :+:    :+:   */
+/*   completion.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/31 15:36:38 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/15 10:22:18 by dde-jesu         ###   ########.fr       */
+/*   Created: 2019/02/15 10:13:43 by dde-jesu          #+#    #+#             */
+/*   Updated: 2019/02/15 10:20:04 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EXEC_H
-# define EXEC_H
+#ifndef COMPLETION_H
+# define COMPLETION_H
 
-# include "shell.h"
+# include "rl.h"
 
-int		exec_binary(char *path, char *argv[], char **env);
-void	exec_buffer(struct s_shell *shell, size_t buffer_size);
-char	*lookup_path(char *name, size_t name_len, char *path);
+void	complete_command(struct s_rl_state *state, char *cmd, size_t size);
 
 #endif

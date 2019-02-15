@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:45 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/12 15:17:32 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/15 10:49:03 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 #define USAGE "[-i] [name=value]... [utility [argument...]]"
 #define DESCRIPTION "env - set the environment for command invocation"
-#define I_1 "Invoke utility with exactly the environment specified" 
+#define I_1 "Invoke utility with exactly the environment specified"
 #define I_2 "by the arguments"
 
 static void	print_env(char **env)
@@ -39,7 +39,8 @@ static void	print_env(char **env)
 /*
 ** Create env array by moving it by one to add a 0 on the argv array
 */
-static int exec_not_inherit(int argc, char **args, struct s_shell *shell)
+
+static int	exec_not_inherit(int argc, char **args, struct s_shell *shell)
 {
 	size_t	i;
 	char	*path;
@@ -57,7 +58,8 @@ static int exec_not_inherit(int argc, char **args, struct s_shell *shell)
 	return (exec_binary(path, args + i, args - 1));
 }
 
-static char	*copy_env_and_get_path(char **env, int argc, char **args, struct s_shell *shell)
+static char	*copy_env_and_get_path(char **env, int argc, char **args,
+		struct s_shell *shell)
 {
 	char	*pos;
 	char	*path;
@@ -112,21 +114,21 @@ static int	exec_inherit(int argc, char **args, struct s_shell *shell)
 
 int			builtin_env(int argc, char **argv, struct s_shell *shell)
 {
-	size_t			i;
-	bool			notInherit;
+	size_t		i;
+	bool		not_inherit;
 	const t_arg	args[] = {
-		{ ARG_BOOLEAN, 'i', "", &notInherit, I_1 " " I_2 },
+		{ ARG_BOOLEAN, 'i', "", &not_inherit, I_1 " " I_2 },
 		{ ARG_END, 0, 0, 0, 0 }};
 	int			ret;
 
-	notInherit = false;
+	not_inherit = false;
 	if ((ret = parse_args(args, argc, argv)) < 0)
 		return (args_usage(args, argv[0], USAGE, DESCRIPTION) || 1);
 	argc -= ret;
 	argv += ret;
 	i = 0;
 	if (argc)
-		return ((notInherit ? exec_not_inherit
+		return ((not_inherit ? exec_not_inherit
 					: exec_inherit)(argc, argv, shell));
 	else
 		print_env(shell->env);

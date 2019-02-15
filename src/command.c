@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:40:25 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/07 17:06:01 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/15 10:48:24 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "builtin.h"
 #include "expand.h"
 #include "rl.h"
+#include "completion.h"
 #include "ft/mem.h"
 #include "ft/str.h"
 #include <stdlib.h>
@@ -35,7 +36,7 @@ static bool	is_executable(struct s_shell *shell, char *cmd, size_t cmd_size)
 		return (access(bin, X_OK) == 0);
 	}
 	if (shell->path)
-		return (lookup_path(cmd, cmd_size, shell->path + 5, bin, sizeof(bin)));
+		return (lookup_path(cmd, cmd_size, shell->path + 5));
 	return (false);
 }
 
@@ -69,7 +70,6 @@ static void	echo(struct s_rl_state *state, char *part, size_t size)
 	write(STDOUT_FILENO, CSI "0m", 4);
 }
 
-
 static void	on_text(struct s_rl_state *state)
 {
 	char	*buffer;
@@ -81,10 +81,11 @@ static void	on_text(struct s_rl_state *state)
 	{
 		if (space == state->buffer || space[-1] == '\0')
 		{
-			ft_memmove(space, space + 1, state->buffer + state->len - (space + 1));
+			ft_memmove(space, space + 1, state->buffer + state->len
+					- (space + 1));
 			state->len -= 1;
 			state->index -= 1;
-			buffer = space ;
+			buffer = space;
 		}
 		else
 		{
@@ -94,69 +95,7 @@ static void	on_text(struct s_rl_state *state)
 	}
 }
 
-#include <dirent.h>
-#include <stdio.h>
-
-void complete_command(struct s_rl_state *state, char *cmd, size_t size)
-{
-	struct s_shell	*shell;
-	char			*shell_path;
-	char			path[PATH_MAX + 1];
-	char			*end;
-	size_t			path_len;
-	DIR				*dir;
-	struct dirent	*entry;
-	char			suggestion[sizeof(entry->d_name)];
-	size_t			suggestion_len;
-
-	suggestion_len = sizeof(suggestion) + 1;
-	shell = state->user_data;
-	if (ft_memchr(cmd, '/', size))
-	{
-	}
-	if (shell->path)
-	{
-		shell_path = shell->path + 5;
-		while (1)
-		{
-			end = ft_strchr(shell_path, ':');
-			if (!end)
-				end = shell_path + ft_strlen(shell_path);
-			path_len = end - shell_path;
-			if (path_len + 1 > sizeof (path))
-			{
-				shell_path = end + 1;
-				continue ;
-			}
-			ft_memcpy(path, shell_path, path_len);
-			path[path_len] = 0;
-			shell_path = end + 1;
-			if (!(dir = opendir(path)))
-				continue ;
-			while ((entry = readdir(dir)))
-			{
-				if (ft_strncmp(entry->d_name, cmd, size) == 0 && entry->d_namlen < sizeof(suggestion))
-				{
-					if (entry->d_namlen <= suggestion_len)
-					{
-						ft_memcpy(suggestion, entry->d_name, entry->d_namlen);
-						suggestion_len = entry->d_namlen;
-					}
-				}
-			}
-			closedir(dir);
-			if (*end == 0)
-				break ;
-		}
-		if (suggestion_len > sizeof(suggestion))
-			return ;
-		ft_memcpy(state->buffer, suggestion, suggestion_len);
-		state->len += suggestion_len - size;
-		state->index += suggestion_len - size;
-	}
-}
-
-static void on_tab(struct s_rl_state *state)
+static void	on_tab(struct s_rl_state *state)
 {
 	char	*word;
 	size_t	len;
@@ -175,11 +114,39 @@ static void on_tab(struct s_rl_state *state)
 	}
 }
 
+#define NO_NL CSI "90m\u23CE" CSI "0m\n"
+
+void		init(struct s_rl_state *state)
+{
+	char	buf[32];
+	uint8_t	i;
+	char	*res;
+
+	(void)state;
+	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO))
+	{
+		write(STDOUT_FILENO, CSI "6n", sizeof(CSI) + 1);
+		i = 0;
+		while (i < sizeof(buf))
+		{
+			if (read(STDIN_FILENO, buf + i, 1) != 1)
+				return ;
+			if (buf[i] == 'R')
+				break ;
+			i++;
+		}
+		if (i > 2 && buf[0] == '\x1b' && buf[1] == '[')
+		{
+			if (!(res = ft_memchr(buf + 2, ';', i - 2)))
+				return ;
+			if (!(res[1] == '1' && res[2] == 'R'))
+				write(1, NO_NL, sizeof(NO_NL) - 1);
+		}
+	}
+}
 
 #define PROMPT ("\xF0\x9F\xA6\x84  > ")
 #define PROMPT_LEN 5
-
-#include <stdio.h>
 
 void		read_command(struct s_shell *shell)
 {
@@ -189,15 +156,13 @@ void		read_command(struct s_shell *shell)
 	state = (struct s_rl_state) {
 		.user_data = shell,
 		.prompt = PROMPT,
-		.prompt_size = sizeof(PROMPT) - 1,
-		.prompt_len = PROMPT_LEN,
+		.prompt_size = sizeof(PROMPT) - 1, .prompt_len = PROMPT_LEN,
 		.buffer = (char *)shell->buffer + shell->env_size,
 		.buffer_size = shell->buffer_size - shell->env_size - 1,
 		.hooks = {
 			[RL_NONE] = on_text,
-			[RL_TAB_CTRL_I] = on_tab
-		},
-		.echo_hook = echo
+			[RL_TAB_CTRL_I] = on_tab},
+		.echo_hook = echo, .init_hook = init
 	};
 	r = readline(&state);
 	write(1, "\n", 1);

@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/12 15:16:01 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/15 10:44:51 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@
 #include <limits.h>
 #include <stdbool.h>
 
-bool		lookup_path(char *name, size_t name_len, char *path, char *res,
-		size_t res_size)
+char		*lookup_path(char *name, size_t name_len, char *path)
 {
-	char	*end;
-	size_t	path_len;
+	static char	bin[PATH_MAX + 1];
+	char		*end;
+	size_t		path_len;
 
 	while (1)
 	{
@@ -32,34 +32,34 @@ bool		lookup_path(char *name, size_t name_len, char *path, char *res,
 		if (!end)
 			end = path + ft_strlen(path);
 		path_len = end - path;
-		if (path_len + 1 + name_len + 1 > res_size)
+		if (path_len + 1 + name_len + 1 > sizeof(bin))
 		{
 			path = end + 1;
 			continue ;
 		}
-		ft_memcpy(res, path, path_len);
-		res[path_len] = '/';
-		ft_memcpy(res + path_len + 1, name, name_len);
-		res[path_len + 1 + name_len] = '\0';
-		if (access(res, X_OK) != -1)
-			return (true);
+		ft_memcpy(bin, path, path_len);
+		bin[path_len] = '/';
+		ft_memcpy(bin + path_len + 1, name, name_len);
+		bin[path_len + 1 + name_len] = '\0';
+		if (access(bin, X_OK) != -1)
+			return (bin);
 		if (*end == 0)
-			return (false);
+			return (NULL);
 		path = end + 1;
 	}
 }
 
-int	exec_binary(char *path, char **argv, char **env)
+int			exec_binary(char *path, char **argv, char **env)
 {
-	char			bin[PATH_MAX + 1];
+	char			*bin;
 	int				pid;
 	int				status;
 	const size_t	av0_size = ft_strlen(argv[0]);
 
 	if (ft_memchr(argv[0], '/', av0_size) && av0_size < sizeof(bin))
-		ft_memcpy(bin, argv[0], av0_size + 1);
+		bin = argv[0];
 	else if (!(path
-		&& lookup_path(argv[0], av0_size, path + 5, bin, sizeof(bin))))
+		&& (bin = lookup_path(argv[0], av0_size, path + 5))))
 	{
 		ft_putf_fd(2, "%s: command not found\n", argv[0]);
 		return (-1);

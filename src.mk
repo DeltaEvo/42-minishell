@@ -1,4 +1,5 @@
 SRCS += src/command.c
+SRCS += src/completion.c
 SRCS += src/exec.c
 SRCS += src/env.c
 SRCS += src/expand.c

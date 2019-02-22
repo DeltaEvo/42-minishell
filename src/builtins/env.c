@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:45 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/15 11:31:26 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/22 10:03:29 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,20 +58,18 @@ static int	exec_not_inherit(int argc, char **args, struct s_shell *shell)
 	return (exec_binary(path, args + i, args - 1));
 }
 
-static char	*copy_env_and_get_path(char **env, int argc, char **args,
+static char	*copy_env_and_get_path(char **env, char **args, char *path,
 		struct s_shell *shell)
 {
 	char	*pos;
-	char	*path;
 	char	*cenv;
 	size_t	i;
 	size_t	j;
 	size_t	k;
 
-	path = shell->path;
 	i = -1;
 	j = shell->env_len;
-	while (++i < (size_t)argc && (pos = ft_strchr(args[i], '=')))
+	while (args[i] && (pos = ft_strchr(args[i], '=')))
 	{
 		if (ft_strncmp(args[i], "PATH=", 5) == 0)
 			path = args[i];
@@ -108,7 +106,7 @@ static int	exec_inherit(int argc, char **args, struct s_shell *shell)
 	env = __builtin_alloca(sizeof(*env) * (len + 1));
 	ft_memcpy(env, shell->env, sizeof(*env) * shell->env_len);
 	env[len] = 0;
-	path = copy_env_and_get_path(env, argc, args, shell);
+	path = copy_env_and_get_path(env, args, shell->path, shell);
 	return (exec_binary(path, args + i, env));
 }
 

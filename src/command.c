@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:40:25 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/15 10:48:24 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/22 10:30:41 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,59 +16,11 @@
 #include "expand.h"
 #include "rl.h"
 #include "completion.h"
+#include "syntax.h"
 #include "ft/mem.h"
 #include "ft/str.h"
 #include <stdlib.h>
 #include <limits.h>
-
-static bool	is_executable(struct s_shell *shell, char *cmd, size_t cmd_size)
-{
-	char	bin[PATH_MAX + 1];
-
-	if (find_builtin(cmd, cmd_size))
-		return (true);
-	if (ft_memchr(cmd, '/', cmd_size))
-	{
-		if (cmd_size + 1 > sizeof(bin))
-			return (false);
-		ft_memcpy(bin, cmd, cmd_size);
-		bin[cmd_size] = 0;
-		return (access(bin, X_OK) == 0);
-	}
-	if (shell->path)
-		return (lookup_path(cmd, cmd_size, shell->path + 5));
-	return (false);
-}
-
-#define CSI "\33["
-
-static void	echo(struct s_rl_state *state, char *part, size_t size)
-{
-	struct s_shell	*shell;
-	char			*space;
-	size_t			len;
-
-	shell = state->user_data;
-	while (true)
-	{
-		if ((space = ft_memchr(part, '\0', size)))
-			len = space - part;
-		else
-			len = size;
-		if (part == state->buffer)
-			write(STDOUT_FILENO,
-				is_executable(shell, part, len) ? CSI "37m" : CSI "31m", 5);
-		else
-			write(STDOUT_FILENO, CSI "36m", 5);
-		write(STDOUT_FILENO, part, len);
-		if (!space)
-			break ;
-		write(STDOUT_FILENO, " ", 1);
-		size -= len + 1;
-		part = space + 1;
-	}
-	write(STDOUT_FILENO, CSI "0m", 4);
-}
 
 static void	on_text(struct s_rl_state *state)
 {
@@ -114,6 +66,7 @@ static void	on_tab(struct s_rl_state *state)
 	}
 }
 
+#define CSI "\33["
 #define NO_NL CSI "90m\u23CE" CSI "0m\n"
 
 void		init(struct s_rl_state *state)
@@ -162,7 +115,7 @@ void		read_command(struct s_shell *shell)
 		.hooks = {
 			[RL_NONE] = on_text,
 			[RL_TAB_CTRL_I] = on_tab},
-		.echo_hook = echo, .init_hook = init
+		.echo_hook = syntax_echo, .init_hook = init
 	};
 	r = readline(&state);
 	write(1, "\n", 1);

@@ -1,20 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   completion.h                                       :+:      :+:    :+:   */
+/*   str.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/15 10:13:43 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/22 16:49:53 by dde-jesu         ###   ########.fr       */
+/*   Created: 2019/02/22 16:50:12 by dde-jesu          #+#    #+#             */
+/*   Updated: 2019/02/22 16:51:31 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMPLETION_H
-# define COMPLETION_H
+#ifndef MINISHELL_STR_H
+# define MINISHELL_STR_H
 
-# include "rl.h"
-
-void	complete_command(struct s_rl_state *state, char *cmd, size_t size);
+struct	s_str {
+	char	*value;
+	size_t	len;
+};
 
 #endif

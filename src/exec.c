@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/15 10:44:51 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/02/22 10:22:51 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,4 +105,23 @@ void		exec_buffer(struct s_shell *shell, size_t buffer_size)
 			argv[j++] = (char *)(shell->buffer + shell->env_size + i);
 	argv[argc] = 0;
 	exec(shell, argc, argv);
+}
+
+bool		is_executable(struct s_shell *shell, char *cmd, size_t cmd_size)
+{
+	char	bin[PATH_MAX + 1];
+
+	if (find_builtin(cmd, cmd_size))
+		return (true);
+	if (ft_memchr(cmd, '/', cmd_size))
+	{
+		if (cmd_size + 1 > sizeof(bin))
+			return (false);
+		ft_memcpy(bin, cmd, cmd_size);
+		bin[cmd_size] = 0;
+		return (access(bin, X_OK) == 0);
+	}
+	if (shell->path)
+		return (lookup_path(cmd, cmd_size, shell->path + 5));
+	return (false);
 }

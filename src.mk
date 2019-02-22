@@ -4,6 +4,7 @@ SRCS += src/exec.c
 SRCS += src/env.c
 SRCS += src/expand.c
 SRCS += src/shell.c
+SRCS += src/syntax.c
 SRCS += src/builtin.c
 SRCS += src/builtins/cd.c
 SRCS += src/builtins/echo.c

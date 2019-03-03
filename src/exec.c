@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/22 10:22:51 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/03 10:41:36 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "ft/str.h"
 #include "ft/io.h"
 #include "ft/mem.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -49,6 +50,8 @@ char		*lookup_path(char *name, size_t name_len, char *path)
 	}
 }
 
+extern int g_pid;
+
 int			exec_binary(char *path, char **argv, char **env)
 {
 	char			*bin;
@@ -68,7 +71,10 @@ int			exec_binary(char *path, char **argv, char **env)
 	if (pid == -1)
 		exit(2);
 	else if (pid != 0)
+	{
+		g_pid = pid;
 		return (waitpid(pid, &status, 0) == 0 ? status : 1);
+	}
 	execve(bin, argv, env);
 	perror("minishell");
 	exit(1);

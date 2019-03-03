@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 15:41:29 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/15 10:22:24 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/03 10:42:41 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,16 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <signal.h>
+
+int	g_pid = 0;
+
+static void	sighandler(int sig)
+{
+	(void)sig;
+	if (g_pid)
+		kill(g_pid, SIGINT);
+}
 
 static void	process_input(struct s_shell *shell)
 {
@@ -66,6 +76,7 @@ int			main(int ac, char *av[], char *env[])
 	uint8_t			buffer[ARG_MAX];
 
 	(void)ac;
+	signal(SIGINT, sighandler);
 	shell = (struct s_shell) {
 		.buffer = buffer,
 		.buffer_size = sizeof(buffer),

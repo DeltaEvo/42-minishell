@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/03/03 10:41:36 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/04 11:09:24 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int			exec_binary(char *path, char **argv, char **env)
 	int				status;
 	const size_t	av0_size = ft_strlen(argv[0]);
 
-	if (ft_memchr(argv[0], '/', av0_size) && av0_size < sizeof(bin))
+	if (ft_memchr(argv[0], '/', av0_size))
 		bin = argv[0];
 	else if (!(path
 		&& (bin = lookup_path(argv[0], av0_size, path + 5))))

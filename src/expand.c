@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:07:28 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/07 17:48:12 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/12 14:33:57 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static void	expand_dollar(struct s_shell *shell, char *arg, size_t *len,
 		ft_memcpy(dollar, var, var_len);
 		*len = *len + var_len - (end - dollar);
 		*size = *size + var_len - (end - dollar);
-		dollar = ft_memchr(dollar + var_len, '$', *len - (dollar - arg));
+		dollar = ft_memchr(dollar + var_len, '$', arg + *len - (dollar + var_len));
 	}
 }
 

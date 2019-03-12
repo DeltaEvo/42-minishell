@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/04 14:09:52 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/03/04 11:09:24 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/12 14:27:57 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
 char		*lookup_path(char *name, size_t name_len, char *path)
 {
@@ -42,7 +43,7 @@ char		*lookup_path(char *name, size_t name_len, char *path)
 		bin[path_len] = '/';
 		ft_memcpy(bin + path_len + 1, name, name_len);
 		bin[path_len + 1 + name_len] = '\0';
-		if (access(bin, X_OK) != -1)
+		if (access(bin, F_OK) != -1)
 			return (bin);
 		if (*end == 0)
 			return (NULL);
@@ -51,6 +52,33 @@ char		*lookup_path(char *name, size_t name_len, char *path)
 }
 
 extern int g_pid;
+
+bool		check_binary(char *bin, bool print)
+{
+	struct stat	stats;
+
+	if (!bin)
+		return (false);
+	if (lstat(bin, &stats) != 0)
+	{
+		if (print)
+			ft_putf_fd(2, "minishell: command not found: %s\n", bin);
+		return (false);
+	}
+	if (!(stats.st_mode & S_IXUSR))
+	{
+		if (print)
+			ft_putf_fd(2, "minishell: permission denied: %s\n", bin);
+		return (false);
+	}
+	if (!(S_ISREG(stats.st_mode) || S_ISLNK(stats.st_mode)))
+	{
+		if (print)
+			ft_putf_fd(2, "minishell: not a regular file: %s\n", bin);
+		return (false);
+	}
+	return (true);
+}
 
 int			exec_binary(char *path, char **argv, char **env)
 {
@@ -64,9 +92,11 @@ int			exec_binary(char *path, char **argv, char **env)
 	else if (!(path
 		&& (bin = lookup_path(argv[0], av0_size, path + 5))))
 	{
-		ft_putf_fd(2, "%s: command not found\n", argv[0]);
+		ft_putf_fd(2, "minishell: command not found: %s\n", argv[0]);
 		return (-1);
 	}
+	if (!check_binary(bin, true))
+		return (-1);
 	pid = fork();
 	if (pid == -1)
 		exit(2);
@@ -76,7 +106,6 @@ int			exec_binary(char *path, char **argv, char **env)
 		return (waitpid(pid, &status, 0) == 0 ? status : 1);
 	}
 	execve(bin, argv, env);
-	perror("minishell");
 	exit(1);
 }
 
@@ -111,23 +140,4 @@ void		exec_buffer(struct s_shell *shell, size_t buffer_size)
 			argv[j++] = (char *)(shell->buffer + shell->env_size + i);
 	argv[argc] = 0;
 	exec(shell, argc, argv);
-}
-
-bool		is_executable(struct s_shell *shell, char *cmd, size_t cmd_size)
-{
-	char	bin[PATH_MAX + 1];
-
-	if (find_builtin(cmd, cmd_size))
-		return (true);
-	if (ft_memchr(cmd, '/', cmd_size))
-	{
-		if (cmd_size + 1 > sizeof(bin))
-			return (false);
-		ft_memcpy(bin, cmd, cmd_size);
-		bin[cmd_size] = 0;
-		return (access(bin, X_OK) == 0);
-	}
-	if (shell->path)
-		return (lookup_path(cmd, cmd_size, shell->path + 5));
-	return (false);
 }

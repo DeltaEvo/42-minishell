@@ -6,19 +6,43 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:27 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/12 15:25:35 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/15 11:33:34 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 #include "env.h"
 #include "ft/args.h"
+#include "ft/io.h"
 #include <unistd.h>
 #include <limits.h>
+#include <sys/stat.h>
 
 #define ARG2BIG "Too many arguments for cd command\n"
 #define NO_HOME "$HOME not set\n"
 #define NO_OLDPWD "$OLDPWD not set\n"
+
+int	go_to(char *directory)
+{
+	struct stat	stats;
+
+	if (lstat(directory, &stats) == -1)
+	{
+		ft_putf_fd(2, "No such file or directory: %s\n", directory);
+		return (1);
+	}
+	if (!S_ISDIR(stats.st_mode))
+	{
+		ft_putf_fd(2, "Not a directory: %s\n", directory);
+		return (1);
+	}
+	if (!(stats.st_mode & S_IXUSR))
+	{
+		ft_putf_fd(2, "Permission denied: %s\n", directory);
+		return (1);
+	}
+	return (chdir(directory));
+}
 
 int	builtin_cd(int argc, char **argv, struct s_shell *shell)
 {
@@ -44,7 +68,7 @@ int	builtin_cd(int argc, char **argv, struct s_shell *shell)
 	if (argc > 1)
 		return (write(2, ARG2BIG, sizeof(ARG2BIG) - 1) & 0 + 1);
 	getcwd(cwd, sizeof(cwd));
-	ret = chdir(directory);
-	sh_setenv(shell, "OLDPWD", cwd);
+	if (!(ret = go_to(directory)))
+		sh_setenv(shell, "OLDPWD", cwd);
 	return (ret);
 }

@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/31 13:27:06 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/02/04 16:10:09 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/15 16:04:37 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ bool		sh_unsetenv(struct s_shell *shell, char *name)
 			(char *)shell->buffer + shell->env_size - (env + len + 1));
 		shell->env_size -= len + 1;
 		shell->env_len -= 1;
+		if (env < shell->path)
+			shell->path -= len + 1;
 		return (shell->dirty_env = true);
 	}
 	else

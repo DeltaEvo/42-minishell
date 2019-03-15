@@ -6,7 +6,7 @@
 /*   By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 16:44:27 by dde-jesu          #+#    #+#             */
-/*   Updated: 2019/03/15 11:33:34 by dde-jesu         ###   ########.fr       */
+/*   Updated: 2019/03/15 16:05:38 by dde-jesu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	go_to(char *directory)
 {
 	struct stat	stats;
 
-	if (lstat(directory, &stats) == -1)
+	if (stat(directory, &stats) == -1)
 	{
 		ft_putf_fd(2, "No such file or directory: %s\n", directory);
 		return (1);
